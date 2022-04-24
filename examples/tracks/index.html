@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Open the console</h1>
+    <video id="videoEl" autoplay playsinline width="500px"></video>
+    <script>
+      var peerConn = new RTCPeerConnection({'iceServers': [{'urls': ['stun:stun.l.google.com:19302']}]});
+      console.log('Call join("some offer")');
+
+      function join(offer) {
+        console.log("Joining ...");
+        
+        peerConn.ontrack = e => {
+          console.log("got track");
+          var el = document.getElementById("videoEl");
+          el.srcObject = e.streams[0];
+          el.play();
+        }
+
+        peerConn.ondatachannel = (e) => {
+          var dataChannel = e.channel;
+          dataChannel.onopen = (e) => {
+            window.say = (msg) => { dataChannel.send(msg); };
+            console.log('Say things with say("hi")');
+          };
+          dataChannel.onmessage = (e) => { console.log('Got message:', e.data); }
+        };
+
+        peerConn.onicecandidate = (e) => {
+          if (e.candidate == null) {
+            console.log("Get the creator to call: gotAnswer(", JSON.stringify(peerConn.localDescription), ")");
+          }
+        };
+
+        var offerDesc = new RTCSessionDescription(offer);
+        peerConn.setRemoteDescription(offerDesc);
+        peerConn.createAnswer({})
+          .then((answerDesc) => peerConn.setLocalDescription(answerDesc))
+          .catch((err) => console.warn("Couldn't create answer"));
+      }
+    </script>
+</body>
+</html>
