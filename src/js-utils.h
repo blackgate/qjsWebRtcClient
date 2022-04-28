@@ -3,6 +3,10 @@
 
 #include <quickjs/quickjs.h>
 
+#ifndef countof
+#define countof(x) (sizeof(x) / sizeof((x)[0]))
+#endif
+
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 typedef struct JSContructorDef_s {
@@ -13,6 +17,7 @@ typedef struct JSContructorDef_s {
 typedef struct JSFullClassDef_s
 {
     JSClassID id;
+    JSClassID baseClass;
     JSClassDef def;
     JSContructorDef constructor;
     size_t funcs_len;
@@ -20,6 +25,7 @@ typedef struct JSFullClassDef_s
 } JSFullClassDef;
 
 int initFullClass(JSContext *ctx, JSModuleDef *m, JSFullClassDef *fullDef);
+int initFullSubClass(JSContext *ctx, JSModuleDef *m, JSFullClassDef *fullDef, JSClassID baseClass);
 void JS_CopyToCStringMax(JSContext *ctx, JSValue val, char* dest, size_t max_len);
 uint32_t JS_GetArrayLength(JSContext *ctx, JSValue array);
 

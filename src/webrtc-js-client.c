@@ -1,12 +1,9 @@
 #include "webrtc-js-client.h"
 #include "RTCPeerConnection-js.h"
 #include "RTCDataChannel-js.h"
+#include "RTCDataChannelBase-js.h"
 #include "RTCTrack-js.h"
 #include "event-queue.h"
-
-#ifndef countof
-#define countof(x) (sizeof(x) / sizeof((x)[0]))
-#endif
 
 #define JS_DEF_FLAG(x) JS_PROP_INT32_DEF(#x, x, JS_PROP_CONFIGURABLE)
 
@@ -29,8 +26,7 @@ static const JSCFunctionListEntry webrtc_global_funcs[] = {
 static int init(JSContext *ctx, JSModuleDef *m) {
     JS_SetModuleExportList(ctx, m, webrtc_global_funcs, countof(webrtc_global_funcs));
     initFullClass(ctx, m, &RTCPeerConnection_Class);
-    initFullClass(ctx, m, &RTCDataChannel_Class);
-    initFullClass(ctx, m, &RTCTrack_Class);
+    initFullClass(ctx, m, &RTCDataChannelBase_Class);
     return 0;
 }
 
@@ -42,7 +38,5 @@ JSModuleDef *JS_INIT_WEBRTC_CLIENT_MODULE(JSContext *ctx, const char *module_nam
     initEventQueue(ctx);
     JS_AddModuleExportList(ctx, m, webrtc_global_funcs, countof(webrtc_global_funcs));
     JS_AddModuleExport(ctx, m, RTCPeerConnection_Class.def.class_name);
-    JS_AddModuleExport(ctx, m, RTCDataChannel_Class.def.class_name);
-    JS_AddModuleExport(ctx, m, RTCTrack_Class.def.class_name);
     return m;
 }
