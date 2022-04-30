@@ -1,28 +1,18 @@
 #include <string.h>
 #include "js-utils.h"
 
-static int initFullClassInternal(JSContext *ctx, JSModuleDef *m, JSFullClassDef *fullDef, JSValue baseProto) {
+int initFullClass(JSContext *ctx, JSModuleDef *m, JSFullClassDef *fullDef) {
     JSValue proto, obj;
     const char *className = fullDef->def.class_name;
-    JSCFunctionListEntry *fns = fullDef->funcs;
     JSContructorDef *constructor = &fullDef->constructor;
     JS_NewClassID(&fullDef->id);
     JS_NewClass(JS_GetRuntime(ctx), fullDef->id, &fullDef->def);
-    proto = JS_IsNull(baseProto) ? JS_NewObject(ctx) : JS_NewObjectProto(ctx, baseProto);
-    JS_SetPropertyFunctionList(ctx, proto, fns, countof(fns));
+    proto = JS_NewObject(ctx);
+    JS_SetPropertyFunctionList(ctx, proto, fullDef->funcs, fullDef->funcs_len / sizeof(fullDef->funcs[0]));
     JS_SetClassProto(ctx, fullDef->id, proto);
     obj = JS_NewCFunction2(ctx, constructor->fn, className, constructor->args_count, JS_CFUNC_constructor, 0);
     JS_SetModuleExport(ctx, m, className, obj);
     return 0;
-}
-
-int initFullClass(JSContext *ctx, JSModuleDef *m, JSFullClassDef *fullDef) {
-    return initFullClassInternal(ctx, m, fullDef, JS_NULL);
-}
-
-int initFullSubClass(JSContext *ctx, JSModuleDef *m, JSFullClassDef *fullDef, JSClassID baseClass) {
-    JSValue baseProto = JS_GetClassProto(ctx, baseClass);
-    return initFullClassInternal(ctx, m, fullDef, baseProto);
 }
 
 void JS_CopyToCStringMax(JSContext *ctx, JSValue val, char* dest, size_t max_len) {
