@@ -2,12 +2,12 @@
 
 A QuickJS WebRTC client implementation using [libdatachannel](https://github.com/paullouisageneau/libdatachannel)
 
-## Instaling dependencies
+## Installing dependencies
 
 Before running the install script make sure you have the following packages installed:
 
 ```sh
-sudo apt install pkg-config libssl-dev libsrtp2-dev libwebsockets-dev libusrsctp-dev
+sudo apt install pkg-config libssl-dev libsrtp2-dev libusrsctp-dev
 ```
 
 Run the install script (this will install libdatachannel)
